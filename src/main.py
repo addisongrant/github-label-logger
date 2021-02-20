@@ -25,6 +25,7 @@ def receive(request):
 
 def verify_signature(request):
     secret = os.getenv("SECRET_TOKEN")
+    payload_body = request.get_json()
     h = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
     return hmac.compare_digest(signature, request.env['HTTP_X_HUB_SIGNATURE_256'])
 
@@ -33,6 +34,6 @@ def create_message(action, number):
     if action:
         message = action
         if number:
-            message = message + f'on {number}'
+            message = message + f' on {number}'
     return message
 
