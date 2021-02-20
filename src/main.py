@@ -1,5 +1,6 @@
 import os
 import hmac
+from flask import abort
 
 def receive(request):
     """Responds to any HTTP request.
@@ -11,11 +12,14 @@ def receive(request):
         `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
     if not verify_signature(request):
-        return abort(500)
+        return abort(403)
 
-    request_json = request.get_json()
-    action = request_json['action']
-    number = request_json['number']
+    payload = request.get_json()
+    action = payload['action']
+    if 'issue' in payload:
+        number = payload['issue']['number']
+    else:
+        number = 0
     message = create_message(action, number)
 
     if message != '':
@@ -24,16 +28,16 @@ def receive(request):
         return abort(404)
 
 def verify_signature(request):
-    secret = os.environ.get("SECRET_TOKEN", "Token not set")
-    payload_body = request.get_json()
-    h = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
-    return hmac.compare_digest(signature, request.env['HTTP_X_HUB_SIGNATURE_256'])
+    secret = bytearray(os.environ.get("SECRET_TOKEN", "Token not set"), 'utf-8')
+    payload_body = request.data
+    signature = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
+    return hmac.compare_digest(signature, request.headers.get('X-Hub-Signature-256'))
 
 def create_message(action, number):
     message = ''
     if action:
         message = action
-        if number:
+        if number != 0:
             message = message + f' on {number}'
     return message
 
