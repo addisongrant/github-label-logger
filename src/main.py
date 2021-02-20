@@ -24,7 +24,7 @@ def receive(request):
         return abort(404)
 
 def verify_signature(request):
-    secret = os.getenv("SECRET_TOKEN")
+    secret = os.environ.get("SECRET_TOKEN", "Token not set")
     payload_body = request.get_json()
     h = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
     return hmac.compare_digest(signature, request.env['HTTP_X_HUB_SIGNATURE_256'])
