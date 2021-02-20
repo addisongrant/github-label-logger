@@ -1,7 +1,7 @@
 import os
 import hmac
 
-def hello_world(request):
+def receive(request):
     """Responds to any HTTP request.
     Args:
         request (flask.Request): HTTP request object.
