@@ -17,13 +17,17 @@ def receive(request):
     payload = request.get_json()
     action = payload['action']
     if 'issue' in payload:
+        action_type = 'issue'
         number = payload['issue']['number']
+    elif 'pull_request' in payload:
+        action_type = 'pull request'
+        number = payload['pull_request']['number']
     else:
         number = 0
     message = create_message(action, number)
 
     if message != '':
-        return 'Thanks for the webhook!'
+        return f'Thanks for the webhook for "{action}" on {action_type} {number}!'
     else:
         return abort(404)
 
