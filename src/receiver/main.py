@@ -1,6 +1,29 @@
-import os
-import hmac
 from flask import abort
+import signature
+
+ACTION = 'action'
+ISSUE = 'issue'
+PR = 'pull_request'
+PR_TO_S = 'pull request'
+NUMBER = 'number'
+
+def getActionSubject(payload):
+    """Extract webhook type and related number
+    Args:
+        payload: JSON string of request body
+    Returns:
+        webhook type, issue or PR number
+    """
+    if ISSUE in payload:
+        action_type = ISSUE
+        number = payload[ISSUE][NUMBER]
+    elif PR in payload:
+        action_type = PR_TO_S
+        number = payload[PR][NUMBER]
+    else:
+        action_type = ''
+        number = 0
+    return action_type, number
 
 def receive(request):
     """Responds to any HTTP request.
@@ -11,19 +34,13 @@ def receive(request):
         Response object using
         `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
-    if not verify_signature(request):
+    if not signature.verify(request):
         return abort(403)
 
     payload = request.get_json()
-    action = payload['action']
-    if 'issue' in payload:
-        action_type = 'issue'
-        number = payload['issue']['number']
-    elif 'pull_request' in payload:
-        action_type = 'pull request'
-        number = payload['pull_request']['number']
-    else:
-        number = 0
+
+    action = payload[ACTION]
+    action_type, number = getActionSubject(payload)
 
     if action and action_type and number:
         return f'Thanks for the webhook for "{action}" on {action_type} {number}!'
@@ -31,11 +48,3 @@ def receive(request):
         return f'Thanks for the "{action}" webhook'
     else:
         return abort(404)
-
-def verify_signature(request):
-    secret = bytearray(os.environ.get("SECRET_TOKEN"), 'utf-8')
-    payload_body = request.data
-    signature = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
-    print(request.headers)
-    return hmac.compare_digest(signature, request.headers.get('HTTP_X_HUB_SIGNATURE'))
-
