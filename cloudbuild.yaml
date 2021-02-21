@@ -6,11 +6,11 @@ steps:
       '--region', '${_REGION}',
       '--allow-unauthenticated',
       '--entry-point', 'receive'
-      '--memory', '${_MEMORY}'
-      '--runtime', '${_RUNTIME}'
-      '--service-account', '${_SERVICE_ACCOUNT}'
-      '--source', '${_SOURCE}'
-      '--timeout', '${_TIMEOUT}'
-      '--set-env-vars', '[SECRET_TOKEN=${_SECRET_TOKEN}]'
+      '--memory', '${_MEMORY}',
+      '--runtime', '${_RUNTIME}',
+      '--service-account', '${_SERVICE_ACCOUNT}',
+      '--source', '${_SOURCE}',
+      '--timeout', '${_TIMEOUT}',
+      '--set-env-vars', '[SECRET_TOKEN=${_SECRET_TOKEN}]',
       '--trigger-http'
     ]
