@@ -32,7 +32,7 @@ def receive(request):
         return abort(404)
 
 def verify_signature(request):
-    secret = bytearray(os.environ.get("SECRET_TOKEN", "Token not set"), 'utf-8')
+    secret = bytearray(os.environ.get("SECRET_TOKEN"), 'utf-8')
     payload_body = request.data
     signature = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
     return hmac.compare_digest(signature, request.headers.get('X-Hub-Signature-256'))
