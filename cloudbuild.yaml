@@ -1,0 +1,16 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+      args: [
+        'functions', 'deploy',
+        'webhook-receiver',
+        '--region', '${_REGION}',
+        '--allow-unauthenticated',
+        '--entry-point', 'receive'
+        '--memory', '${_MEMORY}'
+        '--runtime', '${_RUNTIME}'
+        '--service-account', '${_SERVICE_ACCOUNT}'
+        '--source', '${_SOURCE}'
+        '--timeout', '${_TIMEOUT}'
+        '--set-env-vars', '[SECRET_TOKEN=${_SECRET_TOKEN}]'
+        '--trigger-http'
+      ]
