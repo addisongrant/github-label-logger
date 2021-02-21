@@ -5,7 +5,7 @@ steps:
       'webhook-receiver',
       '--region', '${_REGION}',
       '--allow-unauthenticated',
-      '--entry-point', 'receive'
+      '--entry-point', 'receive',
       '--memory', '${_MEMORY}',
       '--runtime', '${_RUNTIME}',
       '--service-account', '${_SERVICE_ACCOUNT}',
