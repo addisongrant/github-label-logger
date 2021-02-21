@@ -24,10 +24,11 @@ def receive(request):
         number = payload['pull_request']['number']
     else:
         number = 0
-    message = create_message(action, number)
 
-    if message != '':
+    if action and action_type and number:
         return f'Thanks for the webhook for "{action}" on {action_type} {number}!'
+    elif action:
+        return f'Thanks for the "{action}" webhook'
     else:
         return abort(404)
 
@@ -36,12 +37,4 @@ def verify_signature(request):
     payload_body = request.data
     signature = 'sha256=' + hmac.new(secret, payload_body, 'sha256').hexdigest()
     return hmac.compare_digest(signature, request.headers.get('HTTP_X_HUB_SIGNATURE'))
-
-def create_message(action, number):
-    message = ''
-    if action:
-        message = action
-        if number != 0:
-            message = message + f' on {number}'
-    return message
 
